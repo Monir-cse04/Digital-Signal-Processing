@@ -1,0 +1,48 @@
+% Applying Filters
+T = 0.005;
+fs = 1/T;
+t = 0:T:1;
+
+fq = 50;
+x = sin(2*pi*fq*t)+sin(2*pi*100*t);
+
+N = length(x);
+NFFT = 2^nextpow2(N);
+X = fft(x, NFFT);
+mag = abs(X);
+
+f = 0:NFFT-1;
+
+subplot(2,2,1);
+plot(f, mag);
+title("DFT before filter");
+% xlim([0 fs/2]);
+
+% Low Pass filter
+D_low = designfilt('Lowpassfir', 'Filterorder', 6,'CutoffFrequency', 80, 'Samplerate',fs );
+F_low = filtfilt(D_low,x);
+subplot(2,2,2);
+plot(t,F_low);
+title('Lowpass Filtered Signal');
+xlabel('Time')
+ylabel('Magnitude');
+
+% High Pass Filter
+D_high = designfilt('Highpassfir', 'Filterorder', 6, 'CutoffFrequency', 50, 'Samplerate', fs);
+F_high = filtfilt(D_high,x);
+subplot(2,2,3);
+plot(t,F_high);
+title('High Pass Filtered Signal');
+xlabel('Time');
+ylabel('Magnitude');
+
+x_band = x + sin(2*pi*10*t); % new signal added
+
+% Band Pass Filter 
+D_band = designfilt('Bandpassfir', 'Filterorder', 6, 'CutoffFrequency1', 40, 'CutoffFrequency2', 80, 'SampleRate',fs);
+F_band = filtfilt(D_band, x_band);
+subplot(2,2,4);
+plot(t,F_band);
+title('Band Pass Filtered Signal');
+xlabel('Time');
+ylabel('Magnitude');
